@@ -56,32 +56,46 @@ router.get('/ukc/:ukcId', function(req, res) {
     ts_hms.setTimezone("America/New_York");
     var date_query = zpad(ts_hms.getMonth() + 1).toString() + "-" + ts_hms.getDate().toString();
     var hour = ts_hms.getHours();
+    var mins = ts_hms.getMinutes();
     var meal = "";
     console.log(ts_hms.getMonth() + 1);
     console.log(ts_hms.getDate());
     console.log(ts_hms.getHours());
+    console.log(ts_hms.getMinutes());
     console.log(date_query);
 
-    if (hour > 6 && hour < 9){
+    if (hour >= 6 && hour <= 8){
        meal = "breakfast";
     }
-    else if (hour > 11 && hour < 13){
+    else if (hour >= 11 && hour <= 13){
        meal = "lunch";
     }
-    else if (hour > 15 && hour < 17){
+    else if (hour >= 17 && hour < 18){
        meal = "tour";
     }
-    else if (hour > 16 && hour < 21){
+    else if (hour >= 18 && hour < 21){
+      if ( min < 30){
+       meal = "tour";
+      } else{ 
        meal = "dinner";
+      }
     }
     else{
        meal = "invalid";
     }
     
     console.log(meal);
-     
 
-    var query = {"ukc_id" : req.param("ukcId"), "date" : '08-01', "meal" : 'lunch'}
+   if  (meal == "invalid"){
+       var json = '[{"_id":"55b29efff2c91614e5aef927","ukc_id":"60-46","date":"07-24","meal":"lunch","type":"NOK","name":"Wrong","meal_key":"1101-110-11"}]';
+       console.log(json);
+           res.setHeader('Content-Type', 'application/json');
+           res.send(json);
+   }else{
+
+   
+    var query = {"ukc_id" : req.param("ukcId"), "date" : date_query, "meal" : "lunch"}
+    //var query = {"ukc_id" : req.param("ukcId"), "date" : date_query, "meal" : meal}
     collection.find(query,{},function(e,docs){
            res.setHeader('Content-Type', 'application/json');
            var json_data = JSON.parse(JSON.stringify(docs));
@@ -98,13 +112,5 @@ router.get('/ukc/:ukcId', function(req, res) {
             }, 3000);
         }
     });
-
-
-    setTimeout(function() {
-                collection.update(query, {$set: {"type": "NOK"}}, function(err) {
-                if (err) throw err
-                });
-        }, 3000);
-
-
+   }
 });
