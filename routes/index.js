@@ -70,15 +70,18 @@ router.get('/ukc/:ukcId', function(req, res) {
     else if (hour >= 11 && hour <= 13){
        meal = "lunch";
     }
-    else if (hour >= 17 && hour < 18){
+    else if (hour == 17){
        meal = "tour";
     }
-    else if (hour >= 18 && hour < 21){
-      if ( min < 30){
+    else if (hour ==  18){
+      if ( mins < 20){
        meal = "tour";
       } else{ 
        meal = "dinner";
       }
+    }
+    else if (hour > 18 && hour < 21){
+       meal = "dinner";
     }
     else{
        meal = "invalid";
@@ -94,8 +97,8 @@ router.get('/ukc/:ukcId', function(req, res) {
    }else{
 
    
-    var query = {"ukc_id" : req.param("ukcId"), "date" : date_query, "meal" : "lunch"}
-    //var query = {"ukc_id" : req.param("ukcId"), "date" : date_query, "meal" : meal}
+    //var query = {"ukc_id" : req.param("ukcId"), "date" : date_query, "meal" : "lunch"}
+    var query = {"ukc_id" : req.param("ukcId"), "date" : date_query, "meal" : meal}
     collection.find(query,{},function(e,docs){
            res.setHeader('Content-Type', 'application/json');
            var json_data = JSON.parse(JSON.stringify(docs));
